@@ -1,0 +1,119 @@
+ SELECT data."id",
+       (SELECT CASE
+                 WHEN data."windspeed" IS NULL THEN (
+                 	SELECT critical."value"
+                 	FROM
+                 	PUBLIC."criticaldata" critical
+                 	JOIN PUBLIC."stationdata" data ON critical."stationdataid" = data."id"
+                 	JOIN PUBLIC."stationinfo" info ON data."stationinfoid" = info."id"
+                 	WHERE info."stationid" = '40f7069d-3988-4dab-5104-5e5a42b31fa0'
+                 	AND critical."solved" = false
+                 	AND critical."sensor" = 1)
+                 ELSE data."windspeed"
+               END),
+       (SELECT CASE
+                 WHEN data."winddirection" IS NULL THEN (SELECT critical."value"
+                                                         FROM
+                 PUBLIC."criticaldata" critical
+                 JOIN PUBLIC."stationdata" data
+                   ON critical."stationdataid" =
+                      data."id"
+                 JOIN PUBLIC."stationinfo" info
+                   ON data."stationinfoid" =
+                      info."id"
+                                                         WHERE
+                 info."stationid" = '40f7069d-3988-4dab-5104-5e5a42b31fa0'
+                 AND critical."solved" = false
+                 AND critical."sensor" = 2)
+                 ELSE data."winddirection"
+               END),
+       (SELECT CASE
+                 WHEN data."pressure" IS NULL THEN (SELECT critical."value"
+                                                    FROM
+                 PUBLIC."criticaldata" critical
+                 JOIN PUBLIC."stationdata" data
+                   ON critical."stationdataid" =
+                      data."id"
+                 JOIN PUBLIC."stationinfo" info
+                   ON data."stationinfoid" =
+                      info."id"
+                                                    WHERE
+                 info."stationid" = '40f7069d-3988-4dab-5104-5e5a42b31fa0'
+                 AND critical."solved" = false
+                 AND critical."sensor" = 3)
+                 ELSE data."pressure"
+               END),
+       (SELECT CASE
+                 WHEN data."weathertemperature" IS NULL THEN
+                 (SELECT critical."value"
+                  FROM
+                 PUBLIC."criticaldata" critical
+                 JOIN PUBLIC."stationdata" data
+                   ON critical."stationdataid" = data."id"
+                 JOIN PUBLIC."stationinfo" info
+                   ON data."stationinfoid" = info."id"
+                                                              WHERE
+                 info."stationid" = '40f7069d-3988-4dab-5104-5e5a42b31fa0'
+                 AND critical."solved" = false
+                 AND critical."sensor" = 4)
+                 ELSE data."weathertemperature"
+               END),
+       (SELECT CASE
+                 WHEN data."railwaytemperature" IS NULL THEN
+                 (SELECT critical."value"
+                  FROM
+                 PUBLIC."criticaldata" critical
+                 JOIN PUBLIC."stationdata" data
+                   ON critical."stationdataid" = data."id"
+                 JOIN PUBLIC."stationinfo" info
+                   ON data."stationinfoid" = info."id"
+                                                              WHERE
+                 info."stationid" = '40f7069d-3988-4dab-5104-5e5a42b31fa0'
+                 AND critical."solved" = false
+                 AND critical."sensor" = 5)
+                 ELSE data."railwaytemperature"
+               END),
+       (SELECT CASE
+                 WHEN data."humidity" IS NULL THEN (SELECT critical."value"
+                                                    FROM
+                 PUBLIC."criticaldata" critical
+                 JOIN PUBLIC."stationdata" data
+                   ON critical."stationdataid" =
+                      data."id"
+                 JOIN PUBLIC."stationinfo" info
+                   ON data."stationinfoid" =
+                      info."id"
+                                                    WHERE
+                 info."stationid" = '40f7069d-3988-4dab-5104-5e5a42b31fa0'
+                 AND critical."solved" = false
+                 AND critical."sensor" = 7)
+                 ELSE data."humidity"
+               END),
+       (SELECT CASE
+                 WHEN data."couplingtemperature" IS NULL THEN
+                 (SELECT critical."value"
+                  FROM
+                 PUBLIC."criticaldata" critical
+                 JOIN PUBLIC."stationdata" data
+                   ON critical."stationdataid" = data."id"
+                 JOIN PUBLIC."stationinfo" info
+                   ON data."stationinfoid" = info."id"
+                                                               WHERE
+                 info."stationid" = '40f7069d-3988-4dab-5104-5e5a42b31fa0'
+                 AND critical."solved" = false
+                 AND critical."sensor" = 6)
+                 ELSE data."couplingtemperature"
+               END),
+       data."time",
+       data."stationinfoid"
+FROM   PUBLIC."stationdata" data
+       JOIN PUBLIC."stationinfo" info
+         ON info."id" = data."stationinfoid"
+       INNER JOIN (SELECT Max(newData."time") "Time",
+                          "stationinfoid"
+                   FROM   PUBLIC."stationdata" newData
+                   GROUP  BY "stationinfoid"
+                   ORDER  BY "time" DESC) AS sortedData
+               ON data."stationinfoid" = sortedData."stationinfoid"
+                  AND data."time" = sortedData."time"
+WHERE  info."stationid" = '40f7069d-3988-4dab-5104-5e5a42b31fa0'  
